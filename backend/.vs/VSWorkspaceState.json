@@ -1,0 +1,19 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\main",
+    "\\src\\main\\java",
+    "\\src\\main\\java\\com",
+    "\\src\\main\\java\\com\\felanmalan",
+    "\\src\\main\\java\\com\\felanmalan\\backend",
+    "\\src\\main\\java\\com\\felanmalan\\backend\\model",
+    "\\src\\test",
+    "\\src\\test\\java",
+    "\\src\\test\\java\\com",
+    "\\src\\test\\java\\com\\felanmalan",
+    "\\src\\test\\java\\com\\felanmalan\\backend"
+  ],
+  "SelectedNode": "\\src\\main\\java\\com\\felanmalan\\backend\\FelanmalanBackendApplication.java",
+  "PreviewInSolutionExplorer": false
+}

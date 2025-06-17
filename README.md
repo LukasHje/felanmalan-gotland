@@ -18,13 +18,9 @@ felanmalan/
 
 ## 📦  Teknikstack
 - Spring Boot (Java)
-
 - PostgreSQL + PostGIS
-
 - React + Leaflet/MapLibre (frontend)
-
 - Docker / TrueNAS SCALE
-
 - GitHub / GitLab för versionshantering & CI/CD
 
 ## 🚀  Syfte

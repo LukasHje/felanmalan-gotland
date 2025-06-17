@@ -1,6 +1,7 @@
 package com.felanmalan.backend.controller;
 
 import com.felanmalan.backend.model.Report;
+import com.felanmalan.backend.model.ReportDTO;
 import com.felanmalan.backend.repository.ReportRepository;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -31,7 +32,9 @@ public class ReportController {
     }
 
     @GetMapping
-    public List<Report> getAll() {
-        return reportRepository.findAll();
-    }
+	public List<ReportDTO> getAll() {
+		return reportRepository.findAll().stream()
+				.map(ReportDTO::new)
+				.toList();
+	}
 }

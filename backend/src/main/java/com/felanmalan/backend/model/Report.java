@@ -1,6 +1,6 @@
 package com.felanmalan.backend.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import org.locationtech.jts.geom.Point;
 
 @Entity

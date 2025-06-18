@@ -1,0 +1,47 @@
+# IntelliJ / Eclipse / VS Code
+.idea/
+*.iws
+*.ipr
+*.iml
+*.class
+.vscode/
+*.swp
+
+# OS-filer
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Environment and config
+.env
+.env.*
+
+# pgAdmin (docker volume data or local)
+pgadmin/
+pgadmin4.db
+pgadmin4_session
+pgadmin4_storage/
+pgadmin4.log
+*.sqlite
+
+# Docker-specific
+**/pgdata/
+**/volumes/
+*.pid
+
+# Optional: Ignore local Docker builds
+*.tar
+*.bak
+*.old
+*.tmp
+
+# Ignore Kubernetes configs (if dynamically generated)
+kubeconfig.yaml
+
+# Backup files
+*~
+*.bak
+

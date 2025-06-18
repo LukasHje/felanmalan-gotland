@@ -15,7 +15,7 @@ felanmalan/
 ├── scripts/      → CLI-verktyg, start/stopp-script m.m.
 ├── infra/        → Infrastrukturkod (Kubernetes, Ansible, etc.)
 └── README.md     → Denna fil
-
+```
 ## 📦  Teknikstack
 - Spring Boot (Java)
 - PostgreSQL + PostGIS

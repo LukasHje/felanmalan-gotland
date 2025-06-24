@@ -21,10 +21,6 @@ logs/
 
 # pgAdmin (docker volume data or local)
 pgadmin/
-pgadmin4.db
-pgadmin4_session
-pgadmin4_storage/
-pgadmin4.log
 *.sqlite
 
 # Docker-specific
@@ -45,4 +41,5 @@ kubeconfig.yaml
 *~
 *.bak
 
+# container spawn file
 docker-compose.yml

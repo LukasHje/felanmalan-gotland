@@ -45,3 +45,4 @@ kubeconfig.yaml
 *~
 *.bak
 
+docker-compose.yml

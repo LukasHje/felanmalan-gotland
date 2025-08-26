@@ -8,7 +8,7 @@ public class ReportDTO {
     private String categoryName;
     private String userName;
 
-    public ReportDTO() {}
+    //public ReportDTO() {}
 
     public ReportDTO(Long id, String description, double lat, double lng, String categoryName, String userName) {
         this.id = id;

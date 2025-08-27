@@ -1,41 +1,21 @@
-// src/components/ReportList.jsx
-import React, { useEffect, useState } from "react";
-
-const ReportList = () => {
-  const [reports, setReports] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch("http://192.168.0.42:8080/api/reports")
-      .then((response) => {
-        if (!response.ok) throw new Error("Nätverksfel");
-        return response.json();
-      })
-      .then((data) => {
-        setReports(data);
-      })
-      .catch((error) => {
-        console.error("Fel vid hämtning:", error);
-        setError(error.message);
-      });
-  }, []);
-
-  if (error) return <p>Något gick fel: {error}</p>;
-  if (reports.length === 0) return <p>Inga rapporter än.</p>;
-
+export default function ReportList({ items = [] }) {
+  if (!items.length) return <p style={{ opacity: 0.7 }}>Inga rapporter ännu.</p>;
   return (
-    <div>
-      <h2>Rapporter</h2>
-      <ul>
-        {reports.map((report) => (
-          <li key={report.id}>
-            {report.description} – {report.lat}, {report.lng}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 8 }}>
+      {items.map(r => (
+        <li key={r.id} style={{
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+          padding: 10,
+          background: 'var(--card)',
+        }}>
+          <div style={{ fontWeight: 700, color: 'var(--deep)' }}>{r.categoryName || 'Rapport'}</div>
+          <div style={{ opacity: 0.9 }}>{r.description}</div>
+          <div style={{ fontSize: 12, color: 'var(--muted)' }}>
+            {r.lat.toFixed(5)}, {r.lng.toFixed(5)} {r.userName ? `• av ${r.userName}` : ''}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
-};
-
-export default ReportList;
-
+}

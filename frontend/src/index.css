@@ -1,4 +1,4 @@
-/* ==== Colorscheme ==== */
+/* ==== Färgpalett ==== */
 :root {
   --sand: #E9D4C3;
   --coral: #E57C5B;
@@ -18,7 +18,7 @@
   --accent-2: var(--coral);
 }
 
-/* ==== Baslayout ==== */
+/* ==== Bas ==== */
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -44,10 +44,8 @@ html, body, #root {
   border-bottom: 1px solid var(--border);
 }
 
-/* ==== Content and panels ==== */
-.content {
-  padding: 20px;
-}
+/* ==== Layout & paneler ==== */
+.content { padding: 20px; }
 
 .panel {
   background: var(--card);
@@ -64,44 +62,21 @@ html, body, #root {
   height: calc(100vh - 120px);
 }
 
-.form-panel {
-  overflow: auto;
-}
+.form-panel { overflow: auto; }
+.map-panel { display: flex; flex-direction: column; }
 
-.map-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.map-wrap {
-  flex: 1; 
-  min-height: 60vh;
-}
-
-.map {
-  height: 100%; 
-  width: 100%; 
-  min-height: 420px;
-  border-radius: 14px;
-  overflow: hidden;
-}
+.map-wrap { flex: 1; min-height: 60vh; }
+.map { height: 100%; width: 100%; min-height: 420px; border-radius: 14px; overflow: hidden; }
 
 /* ==== Typografi ==== */
-h2, h3 {
-  margin: 8px 0 12px;
-  color: var(--deep);
-}
+h2, h3 { margin: 8px 0 12px; color: var(--deep); }
 
-/* ==== Forms ==== */
-.form label {
-  display: block;
-  margin: 10px 0;
-  font-weight: 500;
-  color: var(--deep);
-}
+/* ==== Form ==== */
+.form label { display: block; margin: 10px 0; font-weight: 500; color: var(--deep); }
 
 .form input,
-.form textarea {
+.form textarea,
+.form select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
@@ -115,14 +90,13 @@ h2, h3 {
 }
 
 .form input:focus,
-.form textarea:focus {
+.form textarea:focus,
+.form select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);
 }
 
-textarea {
-  resize: vertical;
-}
+textarea { resize: vertical; }
 
 /* ==== Buttons ==== */
 .btn {
@@ -137,8 +111,11 @@ textarea {
   transition: filter 0.2s;
 }
 
-.btn:hover {
-  filter: brightness(1.05);
+.btn:hover { filter: brightness(1.05); }
+
+.btn.secondary {
+  background: #fff;
+  color: var(--deep);
 }
 
 .btn.ghost {
@@ -146,24 +123,13 @@ textarea {
   border-color: var(--accent-2);
   color: var(--accent-2);
 }
-
-.btn.ghost:hover {
-  background: var(--accent-2);
-  color: #fff;
-}
+.btn.ghost:hover { background: var(--accent-2); color: #fff; }
 
 /* ==== Divider ==== */
-.divider {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
-}
+.divider { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
 
 /* ==== Leaflet fixes ==== */
-.leaflet-container img {
-  max-width: none !important; /* Fix for fragmented tiles */
-}
-
+.leaflet-container img { max-width: none !important; } /* mot fragmenterade tiles */
 .leaflet-control-attribution,
 .leaflet-control-scale {
   background: #ffffffd9;
@@ -173,17 +139,10 @@ textarea {
   padding: 0 6px;
   color: var(--muted);
 }
+.leaflet-container a { color: var(--deep); }
 
-.leaflet-container a {
-  color: var(--deep);
-}
-
-/* ==== Responsive ==== */
+/* ==== Responsiv ==== */
 @media (max-width: 980px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-  .map {
-    height: 60vh;
-  }
+  .layout { grid-template-columns: 1fr; }
+  .map { height: 60vh; }
 }

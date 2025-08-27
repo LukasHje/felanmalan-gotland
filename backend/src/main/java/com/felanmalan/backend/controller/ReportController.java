@@ -1,36 +1,40 @@
 package com.felanmalan.backend.controller;
 
-import com.felanmalan.backend.model.ReportDTO;
-import com.felanmalan.backend.model.CreateReportRequest;
-import com.felanmalan.backend.model.Report;
-import com.felanmalan.backend.model.User;
-import com.felanmalan.backend.model.Category;
-import com.felanmalan.backend.model.Location;
-import com.felanmalan.backend.repository.ReportRepository;
-import com.felanmalan.backend.repository.UserRepository;
-import com.felanmalan.backend.repository.CategoryRepository;
-import com.felanmalan.backend.repository.LocationRepository;
+import com.felanmalan.backend.model.*;
+import com.felanmalan.backend.repository.*;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    @Autowired private ReportRepository reportRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private CategoryRepository categoryRepository;
-    @Autowired private LocationRepository locationRepository;
+    private static final Logger log = LoggerFactory.getLogger(ReportController.class);
+
+    private final ReportRepository reportRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final LocationRepository locationRepository;
 
     private final GeometryFactory geometryFactory = new GeometryFactory();
+
+    public ReportController(ReportRepository reportRepository,
+                            UserRepository userRepository,
+                            CategoryRepository categoryRepository,
+                            LocationRepository locationRepository) {
+        this.reportRepository = reportRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
+        this.locationRepository = locationRepository;
+    }
 
     // GET /api/reports
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,82 +56,85 @@ public class ReportController {
     // GET /api/reports/{id}
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReportDTO> getReportById(@PathVariable Long id) {
-        return reportRepository.findById(id)
-                .map(report -> {
-                    Point point = report.getLocation().getGeom();
-                    ReportDTO dto = new ReportDTO(
-                            report.getId(),
-                            report.getDescription(),
-                            point.getY(),
-                            point.getX(),
-                            report.getCategory() != null ? report.getCategory().getName() : null,
-                            report.getUser() != null ? report.getUser().getName() : null
-                    );
-                    return ResponseEntity.ok(dto);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return reportRepository.findById(id).map(report -> {
+            Point p = report.getLocation().getGeom();
+            return ResponseEntity.ok(new ReportDTO(
+                    report.getId(), report.getDescription(), p.getY(), p.getX(),
+                    report.getCategory() != null ? report.getCategory().getName() : null,
+                    report.getUser() != null ? report.getUser().getName() : null
+            ));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/reports  (JSON body med CreateReportRequest)
+    // POST /api/reports  (JSON body)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReportDTO> createReport(@RequestBody CreateReportRequest req) {
-        // defensive defaults
-        String userName = (req.userName == null || req.userName.isBlank()) ? "Anonym" : req.userName.trim();
-        String categoryName = (req.categoryName == null || req.categoryName.isBlank()) ? "Okategoriserad" : req.categoryName.trim();
+    public ResponseEntity<?> createReport(@RequestBody CreateReportRequest req) {
+        try {
+            // ---- 1) defensiva kontroller
+            if (req == null) return bad("Body saknas");
+            if (req.description == null || req.description.isBlank()) return bad("description saknas");
+            if (req.lat == null || req.lng == null) return bad("lat/lng saknas");
 
-        // 1) Create/reuse geometry (WGS84)
-        Point point = geometryFactory.createPoint(new Coordinate(req.lng, req.lat));
-        point.setSRID(4326);
-        Location location = new Location();
-        location.setGeom(point);
-        locationRepository.save(location);
+            String userName = (req.userName == null || req.userName.isBlank()) ? "Anonym" : req.userName.trim();
+            String categoryName = (req.categoryName == null || req.categoryName.isBlank()) ? "Okategoriserad" : req.categoryName.trim();
 
-        // 2) Get or create User/Category through name
-        User user = userRepository.findByName(userName).orElseGet(() -> {
-            User u = new User();
-            u.setName(userName);
-            return userRepository.save(u);
-        });
+            // ---- 2) geometri
+            Point point = geometryFactory.createPoint(new Coordinate(req.lng, req.lat));
+            point.setSRID(4326);
+            Location location = new Location();
+            location.setGeom(point);
+            locationRepository.save(location);
 
-        Category category = categoryRepository.findByName(categoryName).orElseGet(() -> {
-            Category c = new Category();
-            c.setName(categoryName);
-            return categoryRepository.save(c);
-        });
+            // ---- 3) user + category (hämta eller skapa)
+            User user = userRepository.findByName(userName).orElseGet(() -> {
+                User u = new User();
+                u.setName(userName);
+                return userRepository.save(u);
+            });
 
-        // 3) Save Report
-        Report report = new Report();
-        report.setDescription(req.description);
-        report.setUser(user);
-        report.setCategory(category);
-        report.setLocation(location);
-        reportRepository.save(report);
+            Category category = categoryRepository.findByName(categoryName).orElseGet(() -> {
+                Category c = new Category();
+                c.setName(categoryName);
+                return categoryRepository.save(c);
+            });
 
-        // 4) Build DTO for response
-        ReportDTO dto = new ReportDTO(
-                report.getId(),
-                report.getDescription(),
-                req.lat,
-                req.lng,
-                category.getName(),
-                user.getName()
-        );
+            // OBS: om dina entiteter kräver fler fält (t.ex. createdAt, status),
+            // sätt dem här innan save()
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+            // ---- 4) spara rapport
+            Report report = new Report();
+            report.setDescription(req.description);
+            report.setUser(user);
+            report.setCategory(category);
+            report.setLocation(location);
+            reportRepository.save(report);
+
+            // ---- 5) svar
+            ReportDTO dto = new ReportDTO(
+                    report.getId(), report.getDescription(), req.lat, req.lng,
+                    category.getName(), user.getName()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+
+        } catch (Exception e) {
+            log.error("Fel vid skapande av rapport", e);
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("message", e.getMessage());
+            body.put("type", e.getClass().getName());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        }
     }
 
-    // PUT /api/reports/{id} (keep simple – won't update geometry here)
+    // PUT /api/reports/{id}
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Report> updateReport(@PathVariable Long id, @RequestBody Report updatedReport) {
-        return reportRepository.findById(id)
-                .map(existing -> {
-                    existing.setDescription(updatedReport.getDescription());
-                    existing.setCategory(updatedReport.getCategory());
-                    existing.setUser(updatedReport.getUser());
-                    Report saved = reportRepository.save(existing);
-                    return ResponseEntity.ok(saved);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> updateReport(@PathVariable Long id, @RequestBody Report updatedReport) {
+        return reportRepository.findById(id).map(existing -> {
+            existing.setDescription(updatedReport.getDescription());
+            existing.setCategory(updatedReport.getCategory());
+            existing.setUser(updatedReport.getUser());
+            Report saved = reportRepository.save(existing);
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -138,5 +145,11 @@ public class ReportController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private ResponseEntity<Map<String, String>> bad(String msg) {
+        Map<String, String> m = new HashMap<>();
+        m.put("message", msg);
+        return ResponseEntity.badRequest().body(m);
     }
 }

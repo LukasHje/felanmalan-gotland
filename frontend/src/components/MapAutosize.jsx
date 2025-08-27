@@ -3,7 +3,6 @@ import { useMap } from 'react-leaflet';
 
 export default function MapAutosize({ deps = [] }) {
   const map = useMap();
-
   useEffect(() => {
     const container = map.getContainer();
     const ro = new ResizeObserver(() => map.invalidateSize());
@@ -21,8 +20,7 @@ export default function MapAutosize({ deps = [] }) {
       map.off('load', onReady);
       window.removeEventListener('resize', onWin);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, ...deps]);
-
   return null;
 }

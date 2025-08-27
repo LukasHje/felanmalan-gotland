@@ -1,21 +1,17 @@
-// src/components/MapView.jsx
-import { MapContainer, TileLayer, Marker, Popup, ScaleControl, useMapEvents } from 'react-leaflet';
-import L from '../leaflet-icons';
-import MapAutosize from './MapAutosize';
+import { MapContainer, TileLayer, Popup, ScaleControl, useMapEvents, CircleMarker } from 'react-leaflet';
+import MapAutosize from './MapAutosize.jsx';
 
 const DEFAULT_CENTER = [57.636, 18.294];
 const DEFAULT_ZOOM = 9;
 
 function ClickHandler({ onMapClick }) {
   useMapEvents({
-    click(e) {
-      onMapClick?.({ lat: e.latlng.lat, lon: e.latlng.lng });
-    },
+    click(e) { onMapClick?.({ lat: e.latlng.lat, lon: e.latlng.lng }); },
   });
   return null;
 }
 
-export default function MapView({ reports = [], draftMarker, onMapClick, onMarkerClick }) {
+export default function MapView({ reports = [], draftMarker, onMapClick }) {
   return (
     <div className="map-wrap">
       <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom className="map">
@@ -27,25 +23,32 @@ export default function MapView({ reports = [], draftMarker, onMapClick, onMarke
         <ScaleControl position="bottomleft" />
         <ClickHandler onMapClick={onMapClick} />
 
-        {/* ordinary marker */}
-        {reports.map(m => (
-          <Marker
-            key={m.id ?? `${m.lat},${m.lon}`}
-            position={[m.lat, m.lon]}
-            eventHandlers={onMarkerClick ? { click: () => onMarkerClick(m) } : undefined}
+        {/* Sparade rapporter som cirklar */}
+        {reports.map(r => (
+          <CircleMarker
+            key={r.id ?? `${r.lat},${r.lng}`}
+            center={[r.lat, r.lng]}
+            radius={8}
+            pathOptions={{ color: '#2A4F6F', weight: 2, fillOpacity: 0.2 }}
           >
             <Popup>
-              <strong>{m.title ?? 'Rapport'}</strong><br />
-              {m.lat.toFixed(5)}, {m.lon.toFixed(5)}
+              <strong>{r.categoryName || 'Rapport'}</strong><br/>
+              {r.description}<br/>
+              {r.lat.toFixed(5)}, {r.lng.toFixed(5)}<br/>
+              {r.userName ? `av ${r.userName}` : null}
             </Popup>
-          </Marker>
+          </CircleMarker>
         ))}
 
-        {/* draft-marker (is seen directly on click) */}
+        {/* Draft-markör (klickad punkt) */}
         {draftMarker?.lat && draftMarker?.lon && (
-          <Marker position={[draftMarker.lat, draftMarker.lon]}>
-            <Popup>Vald plats<br/>{draftMarker.lat.toFixed(5)}, {draftMarker.lon.toFixed(5)}</Popup>
-          </Marker>
+          <CircleMarker
+            center={[draftMarker.lat, draftMarker.lon]}
+            radius={9}
+            pathOptions={{ color: '#E57C5B', weight: 2, fillOpacity: 0.25 }}
+          >
+            <Popup>Vald plats<br />{draftMarker.lat.toFixed(5)}, {draftMarker.lon.toFixed(5)}</Popup>
+          </CircleMarker>
         )}
       </MapContainer>
     </div>

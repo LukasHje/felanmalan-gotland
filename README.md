@@ -28,3 +28,6 @@ Att tillhandahålla en öppen, platsbaserad plattform för felanmälan på Gotla
 
 ## 📄  Licens
 TBD – t.ex. MIT, EUPL eller AGPL beroende på framtida mål.
+
+## 📷 Screenshot of the e-service
+<br />![Screenshot of the e-service frontend.](https://github.com/LukasHje/felanmalan-gotland/blob/master/e-tjanst_felanmalan_gotland.png)

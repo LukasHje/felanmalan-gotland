@@ -6,7 +6,7 @@ export default function ReportForm({ prefill, onSubmit, onCancel, categories = [
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? 1);
   const [userName, setUserName] = useState('Anonym');
-  const [userEmail, setUserEmail] = useState(''); // NYTT
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     if (prefill?.lat && prefill?.lon) {

@@ -30,4 +30,4 @@ Att tillhandahålla en öppen, platsbaserad plattform för felanmälan på Gotla
 TBD – t.ex. MIT, EUPL eller AGPL beroende på framtida mål.
 
 ## 📷 Screenshot of the e-service
-<br />![Screenshot of the e-service frontend.](https://github.com/LukasHje/felanmalan-gotland/blob/master/e-tjanst_felanmalan_gotland.png)
+<br />![Screenshot of the e-service frontend.](e-tjanst_felanmalan_gotland.PNG)

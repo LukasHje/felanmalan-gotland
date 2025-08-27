@@ -7,6 +7,7 @@ public class CreateReportRequest {
     public Double lng;
     public String categoryName;
     public String userName;
+    public String userEmail;
 
     public CreateReportRequest() {}
 }

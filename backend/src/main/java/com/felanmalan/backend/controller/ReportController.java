@@ -47,7 +47,8 @@ public class ReportController {
                     point.getY(), // lat
                     point.getX(), // lng
                     report.getCategory() != null ? report.getCategory().getName() : null,
-                    report.getUser() != null ? report.getUser().getName() : null
+                    report.getUser() != null ? report.getUser().getName() : null,
+                    report.getUser() != null ? report.getUser().getEmail() : null
             );
         }).collect(Collectors.toList());
         return ResponseEntity.ok(result);
@@ -61,7 +62,8 @@ public class ReportController {
             return ResponseEntity.ok(new ReportDTO(
                     report.getId(), report.getDescription(), p.getY(), p.getX(),
                     report.getCategory() != null ? report.getCategory().getName() : null,
-                    report.getUser() != null ? report.getUser().getName() : null
+                    report.getUser() != null ? report.getUser().getName() : null,
+                    report.getUser() != null ? report.getUser().getEmail() : null
             ));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -76,6 +78,7 @@ public class ReportController {
             if (req.lat == null || req.lng == null) return bad("lat/lng saknas");
 
             String userName = (req.userName == null || req.userName.isBlank()) ? "Anonym" : req.userName.trim();
+            String email = (req.userEmail == null || req.userEmail.isBlank()) ? null : req.userEmail.trim();
             String categoryName = (req.categoryName == null || req.categoryName.isBlank()) ? "Okategoriserad" : req.categoryName.trim();
 
             // ---- 2) geometri
@@ -85,23 +88,30 @@ public class ReportController {
             location.setGeom(point);
             locationRepository.save(location);
 
-            // ---- 3) user + category (hämta eller skapa)
-            User user = userRepository.findByName(userName).orElseGet(() -> {
+            // ---- 3) hämta eller skapa User med e-post (krävs av DB)
+            User user = null;
+            if (email != null) {
+                user = userRepository.findByEmail(email).orElse(null);
+            }
+            if (user == null) {
+                user = userRepository.findByName(userName).orElse(null);
+            }
+            if (user == null) {
+                // Skapa ny användare – e-post krävs
                 User u = new User();
                 u.setName(userName);
-                return userRepository.save(u);
-            });
+                u.setEmail(email != null ? email : generatePlaceholderEmail(userName)); // garanterar ej-null & (sannolikt) unik
+                user = userRepository.save(u);
+            }
 
+            // ---- 4) hämta eller skapa Category via namn
             Category category = categoryRepository.findByName(categoryName).orElseGet(() -> {
                 Category c = new Category();
                 c.setName(categoryName);
                 return categoryRepository.save(c);
             });
 
-            // OBS: om dina entiteter kräver fler fält (t.ex. createdAt, status),
-            // sätt dem här innan save()
-
-            // ---- 4) spara rapport
+            // ---- 5) spara Report
             Report report = new Report();
             report.setDescription(req.description);
             report.setUser(user);
@@ -109,10 +119,10 @@ public class ReportController {
             report.setLocation(location);
             reportRepository.save(report);
 
-            // ---- 5) svar
+            // ---- 6) svar
             ReportDTO dto = new ReportDTO(
                     report.getId(), report.getDescription(), req.lat, req.lng,
-                    category.getName(), user.getName()
+                    category.getName(), user.getName(), user.getEmail()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 
@@ -151,5 +161,13 @@ public class ReportController {
         Map<String, String> m = new HashMap<>();
         m.put("message", msg);
         return ResponseEntity.badRequest().body(m);
+    }
+
+    private String generatePlaceholderEmail(String baseName) {
+        String slug = (baseName == null ? "user" : baseName.toLowerCase().replaceAll("[^a-z0-9]+", "-"))
+                .replaceAll("(^-|-$)", "");
+        if (slug.isEmpty()) slug = "user";
+        String token = UUID.randomUUID().toString().substring(0, 8);
+        return slug + "+" + token + "@local";
     }
 }

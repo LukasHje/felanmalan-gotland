@@ -7,16 +7,18 @@ public class ReportDTO {
     private double lng;
     private String categoryName;
     private String userName;
+    private String userEmail;
 
     //public ReportDTO() {}
 
-    public ReportDTO(Long id, String description, double lat, double lng, String categoryName, String userName) {
+    public ReportDTO(Long id, String description, double lat, double lng, String categoryName, String userName, String userEmail) {
         this.id = id;
         this.description = description;
         this.lat = lat;
         this.lng = lng;
         this.categoryName = categoryName;
         this.userName = userName;
+        this.userEmail = userEmail;
     }
 
     // getters and setters
@@ -37,4 +39,7 @@ public class ReportDTO {
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+
+    public String getUserEmail() { return userEmail; }
+    public void getUserEmail(String userEmail) { this.userEmail = userEmail; }
 }

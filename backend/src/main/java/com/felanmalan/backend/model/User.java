@@ -1,21 +1,31 @@
 package com.felanmalan.backend.model;
 
 import javax.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "users")
-public class
-User {
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+    }
+)
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // email – krävs av DB och ska vara unik
+    @Column(name = "email", nullable = false, unique = true, length = 320)
+    private String email;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    // Lägg till fler fält här vid behov (t.ex. createdAt, updatedAt)
 }

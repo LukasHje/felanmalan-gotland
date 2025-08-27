@@ -6,6 +6,7 @@ export default function ReportForm({ prefill, onSubmit, onCancel, categories = [
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? 1);
   const [userName, setUserName] = useState('Anonym');
+  const [userEmail, setUserEmail] = useState(''); // NYTT
 
   useEffect(() => {
     if (prefill?.lat && prefill?.lon) {
@@ -22,7 +23,7 @@ export default function ReportForm({ prefill, onSubmit, onCancel, categories = [
       alert('Lat/Lon måste vara siffror.');
       return;
     }
-    onSubmit?.({ lat: latNum, lon: lonNum, description, categoryId, userName });
+    onSubmit?.({ lat: latNum, lon: lonNum, description, categoryId, userName, userEmail });
   }
 
   return (
@@ -45,8 +46,12 @@ export default function ReportForm({ prefill, onSubmit, onCancel, categories = [
         <input value={lon} onChange={e => setLon(e.target.value)} placeholder="18.294" required />
       </label>
 
-      <label>Ditt namn (valfritt)
+      <label>Ditt namn
         <input value={userName} onChange={e => setUserName(e.target.value)} placeholder="Anonym" />
+      </label>
+
+      <label>E-post
+        <input type="email" value={userEmail} onChange={e => setUserEmail(e.target.value)} placeholder="namn@example.com" />
       </label>
 
       <div style={{ display:'flex', gap:10, marginTop:8 }}>

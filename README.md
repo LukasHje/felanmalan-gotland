@@ -14,6 +14,7 @@ felanmalan/
 ├── docs/         → Dokumentation, diagram, kravspec m.m.
 ├── scripts/      → CLI-verktyg, start/stopp-script m.m.
 ├── infra/        → Infrastrukturkod (Kubernetes, Ansible, etc.)
+├── screenshots/  → Screenshots of application
 └── README.md     → Denna fil
 ```
 ## 📦  Teknikstack
@@ -31,3 +32,5 @@ TBD – t.ex. MIT, EUPL eller AGPL beroende på framtida mål.
 
 ## 📷 Screenshot of the e-service
 ![Screenshot of the e-service frontend.](screenshots/e-tjanst_felanmalan_gotland.PNG)
+
+more screenshots of e-service can be found here: [felanmalan-gotland/screenshots](screenshots)
